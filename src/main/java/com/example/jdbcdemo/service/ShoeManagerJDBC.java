@@ -21,6 +21,7 @@ public class ShoeManagerJDBC implements ShoeManager {
 	
 	private PreparedStatement addShoeStmt;
 	private PreparedStatement deleteAllShoesStmt;
+	private PreparedStatement deleteShoeStmt;
 	private PreparedStatement getAllShoesStmt;
 	private PreparedStatement updateShoeStmt; 
 
@@ -48,8 +49,10 @@ public class ShoeManagerJDBC implements ShoeManager {
 					.prepareStatement("INSERT INTO Shoe (name, size, price) VALUES (?,?,?)");
 			deleteAllShoesStmt = connection
 					.prepareStatement("DELETE FROM Shoe");
+			deleteShoeStmt = connection
+					.prepareStatement("DELETE FROM Shoe where id=?");
 			updateShoeStmt = connection
-					.prepareStatement("UPDATE FROM Shoe SET");
+					.prepareStatement("UPDATE Shoe SET name=?, size=?, price=? WHERE id=?");
 			getAllShoesStmt = connection
 					.prepareStatement("SELECT id, name, size, price FROM Shoe");
 
@@ -70,7 +73,7 @@ public class ShoeManagerJDBC implements ShoeManager {
 		}
 	}
 	
-	//@Override
+	@Override
 	public int addShoe(Shoe shoe) {
 		int count = 0;
 		try {
@@ -86,6 +89,37 @@ public class ShoeManagerJDBC implements ShoeManager {
 		return count;
 	}
 	
+	@Override
+	public int updateShoe(Shoe shoe) {
+		int count = 0;
+		try{
+		updateShoeStmt.setString(1, shoe.getName());
+		updateShoeStmt.setInt(2, shoe.getSize());
+		updateShoeStmt.setDouble(3, shoe.getPrice());
+		updateShoeStmt.setLong(4, shoe.getID()); 
+		
+		count=updateShoeStmt.executeUpdate(); 
+		}
+	 catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return count;	
+	}
+	@Override
+	public int deleteShoe(Shoe shoe) {
+		int count = 0;
+		try{
+		deleteShoeStmt.setLong(1, shoe.getID());
+		count=deleteShoeStmt.executeUpdate(); 
+		}
+	 catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return count;	
+	}
+
+	
+	@Override
 	public List<Shoe> getAllShoes() {
 		List<Shoe> shoes = new ArrayList<Shoe>();
 
@@ -106,12 +140,21 @@ public class ShoeManagerJDBC implements ShoeManager {
 		}
 		return shoes;
 	}
-
+	
+		
 	@Override
-	public int update(Shoe shoe) {
-		// TODO Auto-generated method stub
-		return 0;
+		public Shoe findShoe(int id)
+	{
+		for (int i = 0; i<getAllShoes().size(); i++) 
+		{
+			if(getAllShoes().get(i).getID() == id) return getAllShoes().get(i) ; 
+		}
+		
+		return null; 
+		
+		
 	}
+
 
 	
 

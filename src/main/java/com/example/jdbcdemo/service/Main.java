@@ -25,6 +25,7 @@ public class Main {
 		System.out.println("2 - jezeli chcesz edytowac produkt");
 		System.out.println("3 - jezeli chcesz usunac produkt");
 		System.out.println("4 - jezeli chcesz usunac WSZYSTKIE produkty");
+		System.out.println("5 - jezeli chcesz zakonczyc program");
 		Scanner in= new Scanner(System.in);
 		int number = in.nextInt();
 		boolean blad = false; 
@@ -75,27 +76,27 @@ public class Main {
 	        		  System.out.println("edytujesz:");
 	        		  System.out.print("ID: "+s2.getID()+" name: " + s2.getName()+ " size:" + s2.getSize()
 								 + " price: " + s2.getPrice() + "\n");
-	        				  
-	         // s2.setID(id); 
-	          System.out.println("Wprowadz nowa nazwe albo wcsnij enter jezeli chcesz pozostawic stara nazwe");
-	          name=in.next(); 
-	         
-	          if(name != null)s2.setName(name);
+	          System.out.println("Wprowadz nowa nazwe lub wpisz 0 jesli chcesz pozostawic nazwe bez zmian");
+	          in.nextLine();
+	          name=in.nextLine(); 
+	          if(!name.equals("0")) s2.setName(name);
 	            try{ 
-	            	 System.out.println("Wprowadz nowy rozmiar albo wcsnij enter jezeli chcesz pozostawic rozmiar bez zmian");
-		        	 int size = in.nextInt();
-		        	 s2.setSize(size); 
+	            	 System.out.println("Wprowadz nowy rozmiar lub wpisz 0 jesli chcesz pozostawic rozmiar bez zmian");
+	            	 int size = in.nextInt();
+	            	 if(size!=0) s2.setSize(size); 
 		        	 }
 		         catch (InputMismatchException n){
 		        	 System.out.println("rozmiar musi byc liczba calkowita");
 		        	 menu(); 
 		       	 }
-	          
-	          
-		          System.out.println("Wprowadz nowa cene albo wcsnij enter jezeli chcesz pozostawic cene bez zmian");
+	         
+		         System.out.println("Wprowadz nowa cene lub wpisz 0 jesli chcesz pozostawic cene bez zmian");
+		         
 		         String price2 = in.next();
-		         if(doubleValid(price2)==true)
-		         s2.setPrice(Double.parseDouble(price2));
+		        
+		         if(doubleValid(price2)==true){
+		        	 if(Double.parseDouble(price2)>0) s2.setPrice(Double.parseDouble(price2));
+		         }
 		         else {
 			        	 System.out.println("cena musi byc liczba rzeczywista");
 			        	 menu(); 
@@ -114,7 +115,6 @@ public class Main {
 	          System.out.println("usun wszystko");
 	          break;
 	      case 5:
-	          System.out.println("usunieto wszystko");
 	          break;
 	          
 	      default:
@@ -138,13 +138,8 @@ public class Main {
 	public static void main(String[] args) throws Exception{
 	
 		List <Shoe> shoes = new ArrayList<>(); 
-
-		Shoe shoe = new Shoe("Addidas 3030",38,399.99);
-
 		ShoeManagerJDBC conn = new ShoeManagerJDBC(); 
 		conn.getConnection(); 
-	
-	    //conn.addShoe(shoe);
 	
 		shoes.addAll(conn.getAllShoes()); 
 		

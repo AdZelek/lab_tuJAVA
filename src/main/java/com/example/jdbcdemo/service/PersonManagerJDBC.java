@@ -11,7 +11,7 @@ import java.util.List;
 
 import com.example.jdbcdemo.domain.Person;
 
-public class PersonManagerJDBC implements PersonManager{
+public class PersonManagerJDBC implements PersonManager {
 
 	private Connection connection;
 
@@ -66,8 +66,8 @@ public class PersonManagerJDBC implements PersonManager{
 			e.printStackTrace();
 		}
 	}
-	
-	//@Override
+
+	// @Override
 	public int addPerson(Person person) {
 		int count = 0;
 		try {
@@ -101,5 +101,27 @@ public class PersonManagerJDBC implements PersonManager{
 		}
 		return persons;
 	}
+
+	/*public void addAllPersons(List<Person> persons) {
+		try {
+			connection.setAutoCommit(false);
+			for (Person person : persons) {
+				addPerson(person);
+				addPersonStmt.setString(1, person.getName());
+				addPersonStmt.setInt(2, person.getYob());
+				addPersonStmt.executeUpdate();
+
+			}
+			connection.commit();
+		} catch (SQLException exception) {
+			try {
+				connection.rollback();
+			} catch (SQLException e) {
+				//!!! Alarm 
+				e.printStackTrace();
+			}
+			
+		}
+}*/
 
 }

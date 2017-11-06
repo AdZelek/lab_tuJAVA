@@ -7,8 +7,8 @@ import com.example.jdbcdemo.domain.Person;
 public interface PersonManager {
 	
 	public int addPerson(Person person);
-	//public void remove(long id); 
 	public List<Person> getAllPersons();
-	//public List<Person> findByName();
+    /*metoda transakcyjna - albo wszystkie albo zadna */ 
+//	public void addAllPersons(List<Person> persons);
 
 }

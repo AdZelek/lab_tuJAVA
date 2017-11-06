@@ -12,6 +12,7 @@ public interface ShoeManager {
 	public int deleteShoe (Shoe shoe);
 	public List<Shoe> getAllShoes();
 	public Shoe findShoe(int id); 
+	public void addAllShoes(List<Shoe> shoes);
 	
 
 }

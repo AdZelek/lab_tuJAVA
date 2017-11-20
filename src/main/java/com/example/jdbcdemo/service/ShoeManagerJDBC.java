@@ -24,6 +24,9 @@ public class ShoeManagerJDBC implements ShoeManager {
 	private PreparedStatement deleteShoeStmt;
 	private PreparedStatement getAllShoesStmt;
 	private PreparedStatement updateShoeStmt;
+	private PreparedStatement findShoeIdStmt;
+	private PreparedStatement findShoeNameStmt;
+
 
 	private Statement statement;
 
@@ -50,12 +53,17 @@ public class ShoeManagerJDBC implements ShoeManager {
 			deleteAllShoesStmt = connection
 					.prepareStatement("DELETE FROM Shoe");
 			deleteShoeStmt = connection
-					.prepareStatement("DELETE FROM Shoe where id=?");
+					.prepareStatement("DELETE FROM Shoe WHERE id=?");
 			updateShoeStmt = connection
 					.prepareStatement("UPDATE Shoe SET name=?, size=?, price=? WHERE id=?");
 			getAllShoesStmt = connection
 					.prepareStatement("SELECT id, name, size, price FROM Shoe");
+			findShoeIdStmt =  connection
+					.prepareStatement("SELECT id, name, size, price FROM Shoe WHERE id=?");
+			findShoeNameStmt =  connection
+					.prepareStatement("SELECT id, name, size, price FROM Shoe WHERE name=?");
 
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -90,12 +98,12 @@ public class ShoeManagerJDBC implements ShoeManager {
 	}
 
 	@Override
-	public int updateShoe(Shoe shoe) {
+	public int updateShoe(Shoe shoe, String name,int size, double price) {
 		int count = 0;
 		try {
-			updateShoeStmt.setString(1, shoe.getName());
-			updateShoeStmt.setInt(2, shoe.getSize());
-			updateShoeStmt.setDouble(3, shoe.getPrice());
+			updateShoeStmt.setString(1, name);
+			updateShoeStmt.setInt(2, size);
+			updateShoeStmt.setDouble(3, price);
 			updateShoeStmt.setLong(4, shoe.getID());
 
 			count = updateShoeStmt.executeUpdate();
@@ -104,6 +112,23 @@ public class ShoeManagerJDBC implements ShoeManager {
 		}
 		return count;
 	}
+	
+	@Override
+    public int updateShoeName(Shoe shoe, String name) {
+        return updateShoe(shoe, name, shoe.getSize(), shoe.getPrice());
+    }
+	
+	@Override
+	public int updateShoeSize(Shoe shoe, int size) {
+        return updateShoe(shoe, shoe.getName(), size, shoe.getPrice());
+    }
+	
+	@Override
+	public int updateShoePrice(Shoe shoe, double price) {
+        return updateShoe(shoe, shoe.getName(), shoe.getSize(), price);
+    }
+	
+	
 
 	@Override
 	public int deleteShoe(Shoe shoe) {
@@ -116,6 +141,15 @@ public class ShoeManagerJDBC implements ShoeManager {
 		}
 		return count;
 	}
+	
+	@Override
+    public void deleteAllShoes() {
+        try {
+            deleteAllShoesStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public List<Shoe> getAllShoes() {
@@ -140,7 +174,7 @@ public class ShoeManagerJDBC implements ShoeManager {
 	}
 
 	@Override
-	public Shoe findShoe(int id) {
+	public Shoe findShoeId(int id) {
 		for (int i = 0; i < getAllShoes().size(); i++) {
 			if (getAllShoes().get(i).getID() == id)
 				return getAllShoes().get(i);
@@ -150,13 +184,25 @@ public class ShoeManagerJDBC implements ShoeManager {
 	}
 
 	@Override
+	public Shoe findShoeName(String name) {
+		for (int i = 0; i < getAllShoes().size(); i++) {
+			if (getAllShoes().get(i).getName() == name)
+				return getAllShoes().get(i);
+		}
+
+		return null;
+	}
+	@Override
 	public void addAllShoes(List<Shoe> shoes) {
 		try {
-			connection.setAutoCommit(false);
+			
 			for (Shoe shoe : shoes) {
+				connection.setAutoCommit(false);
+				
 				addShoeStmt.setString(1, shoe.getName());
 				addShoeStmt.setInt(2, shoe.getSize());
 				addShoeStmt.setDouble(3, shoe.getPrice());
+				addShoeStmt.executeUpdate();
 			}
 			connection.commit();
 		} catch (SQLException exception) {
@@ -167,5 +213,31 @@ public class ShoeManagerJDBC implements ShoeManager {
 			}
 		}
 	}
+	
+	  @Override
+	    public int deleteAllSelectedShoes(List<Long> ids) {
+	        int count = 0;
+	        try {
+	            for (Long id : ids) {
+	                connection.setAutoCommit(false);
+
+	                deleteShoeStmt.setLong(1, id);
+	                count = count + deleteShoeStmt.executeUpdate();
+	            }
+	            if (count != ids.size()) {
+	                connection.rollback();
+	            }
+	            connection.commit();
+	        } catch (SQLException e) {
+	            try {
+	                connection.rollback();
+	            } catch (SQLException e1) {
+	                e1.printStackTrace();
+	            }
+	        }
+	        System.out.println(count);
+
+	        return count;
+	    }
 
 }
